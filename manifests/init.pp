@@ -268,9 +268,16 @@ class network (
     }
     case $::lsbmajdistrelease {
       '7': {
-        exec { 'sethostname':
-          command => "/usr/bin/hostnamectl set-hostname ${manage_hostname}",
-          unless  => "/usr/bin/hostnamectl status | grep 'Static hostname: ${manage_hostname}'",
+        if $::virtual == 'lxc' {
+          exec { 'sethostname':
+            command => "/usr/bin/hostname ${manage_hostname}",
+            unless  => "/usr/bin/hostname | /usr/bin/grep ${manage_hostname}",
+          }
+        } else {
+          exec { 'sethostname':
+            command => "/usr/bin/hostnamectl set-hostname ${manage_hostname}",
+            unless  => "/usr/bin/hostnamectl status | grep 'Static hostname: ${manage_hostname}'",
+          }
         }
       }
       default: {}
